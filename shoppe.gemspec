@@ -27,9 +27,10 @@ Gem::Specification.new do |s|
 
   s.add_dependency "nifty-key-value-store", ">= 1.0.1", "< 2.0.0"
   s.add_dependency "nifty-utils", "~> 1.0"
-  s.add_dependency "nifty-attachments", ">= 1.0.3", "< 2.0.0"
   s.add_dependency "nifty-dialog", "~> 1.0"
-  
+
+  s.add_dependency "paperclip", "~> 4.2"
+
   s.add_development_dependency "sqlite3", "~> 1.3"
   s.add_development_dependency "mysql2", "~> 0.3"
   s.add_development_dependency 'yard', "~> 0"
