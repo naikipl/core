@@ -1,9 +1,12 @@
 Shoppe::Engine.routes.draw do
-  
+
   get 'attachment/:id/:filename.:extension' => 'attachments#show'
   resources :product_categories
   resources :products do
     resources :variants
+    member do
+      put :remove_datasheet
+    end
   end
   resources :orders do
     post :search, :on => :collection
@@ -22,15 +25,15 @@ Shoppe::Engine.routes.draw do
   resources :tax_rates
   resources :users
   resources :countries
-  resources :attachments, :only => :destroy
+  resources :images, only: :destroy
 
   get 'settings'=> 'settings#edit'
   post 'settings' => 'settings#update'
-  
+
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
   match 'login/reset' => 'sessions#reset', :via => [:get, :post]
-  
+
   delete 'logout' => 'sessions#destroy'
   root :to => 'dashboard#home'
 end

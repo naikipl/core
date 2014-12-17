@@ -14,10 +14,16 @@
   = field_set_tag t(:attachments) do
 
     %dl
-      %dt= f.label :image_file, t(:image)
+      %dt= f.label :image, t(:image)
       %dd
-        = attachment_preview @product_category.image
-        %p= f.file_field :image_file
+        - if @product_category.image
+          .attachmentPreview.image
+            .imgContainer
+              .img{style: "background-image:url(#{@product_category.image.url})"}
+            .desc
+              %span.filename= @product_category.image.file_name
+              %span.delete= delete_image_link(@product_category.image)
+        %p= f.file_field :image
 
   %p.submit
     - unless @product_category.new_record?

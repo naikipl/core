@@ -1,41 +1,30 @@
 module Shoppe
   module ApplicationHelper
-    
+
     def navigation_manager_link(item)
       link_to item.description, item.url(self), item.link_options.merge(:class => item.active?(self) ? 'active' : 'inactive')
     end
-  
+
     def status_tag(status)
       content_tag :span, status, :class => "status-tag #{status}"
     end
-  
-    def attachment_preview(attachment, options = {})
-      if attachment
-        String.new.tap do |s|
-          if attachment.image?
-            style = "style='background-image:url(#{attachment.path})'"
-          else
-            style = ''
-          end
-          s << "<div class='attachmentPreview #{attachment.image? ? 'image' : 'doc'}'>"
-          s << "<div class='imgContainer'><div class='img' #{style}></div></div>"
-          s << "<div class='desc'>"
-          s << "<span class='filename'><a href='#{attachment_path(attachment)}'>#{attachment.file_name}</a></span>"
-          s << "<span class='delete'>"
-          s << link_to(t('shoppe.helpers.attachment_preview.delete', :default => 'Delete this file?'), attachment_path(attachment), :method => :delete, :data => {:confirm => t('shoppe.helpers.attachment_preview.delete_confirm', :default => "Are you sure you wish to remove this attachment?")})
-          s << "</span>"
-          s << "</div>"
-          s << "</div>"
-        end.html_safe
-      elsif !options[:hide_if_blank]
-        "<div class='attachmentPreview'><div class='imgContainer'><div class='img none'></div></div><div class='desc none'>No attachment</div></div>".html_safe
-      end
-    end
-    
+
     def settings_label(field)
       "<label for='settings_#{field}'>#{t("settings.labels.#{field}")}</label>".html_safe
     end
-    
+
+    def remove_datasheet_link(product)
+      label = t('shoppe.helpers.attachment_preview.delete', default: 'Delete this file?')
+      confirm_text = t('shoppe.helpers.attachment_preview.delete_confirm', default: "Are you sure you wish to remove this attachment?")
+      link_to(label, remove_datasheet_product_path(product), method: :put, data: {confirm: confirm_text })
+    end
+
+    def delete_image_link(image)
+      label = t('shoppe.helpers.attachment_preview.delete', default: 'Delete this file?')
+      confirm_text = t('shoppe.helpers.attachment_preview.delete_confirm', default: "Are you sure you wish to remove this attachment?")
+      link_to(label, image_path(image), method: :delete, data: { confirm: confirm_text })
+    end
+
     def settings_field(field, options = {})
       default = I18n.t("shoppe.settings.defaults")[field.to_sym]
       value = (params[:settings] && params[:settings][field]) || Shoppe.settings[field.to_s]
@@ -55,7 +44,7 @@ module Shoppe
         text_field_tag "settings[#{field}]", value, options.merge(:placeholder => default, :class => 'text')
       end
     end
-  
+
     def t text , opts = {}
       opts[:scope] = "shoppe" unless opts[:scope]
       I18n.t( text , opts)

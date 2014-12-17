@@ -4,7 +4,7 @@
     %dl
       %dt= f.label :product_category_id
       %dd= f.collection_select :product_category_id, Shoppe::ProductCategory.ordered, :id, :name, {:include_blank => true}, {:class => 'chosen'}
-  
+
     .splitContainer
       %dl.third
         %dt= f.label :name , t(:name)
@@ -24,7 +24,7 @@
     %dl
       %dt= f.label :in_the_box, t(:in_the_box)
       %dd= f.text_area :in_the_box, :class => 'text'
-  
+
   = field_set_tag t(:attributes) do
     .margin
       %table.productAttributes
@@ -32,7 +32,7 @@
           %tr
             %td= t(:name)
             %td= t(:value)
-            %td.searchable= t(:is_searchable) 
+            %td.searchable= t(:is_searchable)
             %td.searchable= t(:is_public)
             %td.remove= t(:remove)
             %td
@@ -53,21 +53,35 @@
               %td.remove= link_to t(:remove), '#', :class => 'button button-mini purple'
               %td.handle
       %p.addAttribute= link_to t(:attribute_add), '#', :data => {:behavior => 'addAttributeToAttributesTable'}, :class => 'button button-mini green'
-      
+
   = field_set_tag "Attachments" do
     .splitContainer
       %dl.half
-        %dt= f.label :default_image_file, t(:default_image)
-        %dd
-          = attachment_preview @product.default_image
-          %p= f.file_field :default_image_file
+        %dt= f.label :images
+        - @product.images.each do |image|
+          %dd
+            .attachmentPreview.image
+              .imgContainer
+                .img{style: "background-image:url(#{image.url})"}
+              .desc
+                %span.filename= f.label image.file_name
+                %span.delete= delete_image_link(image)
+
+        %p= f.file_field :images, multiple: true
       %dl.half
-        %dt= f.label :data_sheet_file, t(:datasheet)
-        %dd
-          = attachment_preview @product.data_sheet
-          %p= f.file_field :data_sheet_file
-     
-  - unless @product.has_variants?   
+        %dt= f.label :data_sheet, t(:datasheet)
+        - if @product.data_sheet.present? && !@product.data_sheet.dirty?
+          %dd
+            .attachmentPreview.doc
+              .imgContainer
+                .img{style: "background-image:url(#{@product.data_sheet.url})"}
+              .desc
+                %span.filename= @product.data_sheet_file_name
+                %span.delete= remove_datasheet_link(@product)
+        - else
+          %p= f.file_field :data_sheet
+
+  - unless @product.has_variants?
     = field_set_tag t(:pricing) do
       .splitContainer
         %dl.third
@@ -85,13 +99,13 @@
         %dl.third
           %dt= f.label :tax_rate_id , t(:tax_rate)
           %dd= f.collection_select :tax_rate_id, Shoppe::TaxRate.ordered, :id, :description, {:include_blank => true}, {:class => 'chosen-with-deselect', :data => {:placeholder => t(:tax_none)}}
-  
+
     = field_set_tag t(:stock_control) do
       .splitContainer
         %dl.half
           %dt= f.label :weight , t(:weight)
           %dd= f.text_field :weight, :class => 'text'
-      
+
         %dl.half
           %dt= f.label :stock_control , t(:stock_control)
           %dd.checkbox
@@ -109,7 +123,7 @@
       %dl.half
         %dt= f.label :featured, t(:is_featured)
         %dd.checkbox
-          = f.check_box :featured 
+          = f.check_box :featured
           = f.label :featured, t(:is_featured_help)
 
   %p.submit
