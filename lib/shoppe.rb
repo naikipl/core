@@ -40,8 +40,8 @@ module Shoppe
     # Defines a new set of settings which should be configrable from the settings page
     # in the Shoppe UI.
     def add_settings_group(group, fields = [])
-      settings_groups[group]  ||= []
-      settings_groups[group]    = settings_groups[group] | fields
+      settings_groups[group] ||= []
+      settings_groups[group] = settings_groups[group] | fields
     end
 
     # All settings groups which are available for configuration on the settings page.

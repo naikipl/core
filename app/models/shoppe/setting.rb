@@ -2,17 +2,25 @@ require 'ostruct'
 
 module Shoppe
   class Setting < ActiveRecord::Base
-    
+
     # Validations
     validates :key, :presence => true, :uniqueness => true
     validates :value, :presence => true
     validates :value_type, :presence => true
-    
+
     before_validation do
       self.value_type = I18n.t("shoppe.settings.types")[self.key.to_sym].try(:capitalize) || self.value.class.to_s
       self.value      = encoded_value
     end
-    
+
+    after_save :regenerate_images
+
+    def regenerate_images
+      if key == 'image_styles' && value_changed?
+        Shoppe::Image.reprocess!
+      end
+    end
+
     # The encoded value for saving in the backend (as a string)
     #
     # @return [String]
@@ -23,7 +31,7 @@ module Shoppe
       else                        value.to_s
       end
     end
-    
+
     # The decoded value for the setting attribute (in it's native type)
     #
     # @return [Object]
@@ -36,7 +44,7 @@ module Shoppe
       else                        value.to_s
       end
     end
-    
+
     # A full hash of all settings available in the current scope
     #
     # @return [Hash]
@@ -46,8 +54,8 @@ module Shoppe
         h
       end
     end
-    
-    # Update settings from a given hash and persist them. Accepts a 
+
+    # Update settings from a given hash and persist them. Accepts a
     # hash of keys (which should be strings).
     #
     # @return [Hash]
@@ -63,6 +71,6 @@ module Shoppe
       end
       hash
     end
-    
+
   end
 end

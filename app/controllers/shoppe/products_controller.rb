@@ -17,7 +17,7 @@ module Shoppe
       if @product.save
         if params[:product][:images]
           params[:product][:images].each do |image|
-            @product.images.create(file: image)
+            @product.images.create(source: image)
           end
         end
 
@@ -34,7 +34,7 @@ module Shoppe
       if @product.update(safe_params)
         if params[:product][:images]
           params[:product][:images].each do |image|
-            @product.images.create(file: image)
+            @product.images.create(source: image)
           end
         end
         redirect_to [:edit, @product], :flash => {:notice => confirm_updated(:product) }

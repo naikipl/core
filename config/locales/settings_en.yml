@@ -1,12 +1,13 @@
 en:
   shoppe:
-            
+
     settings:
-      
+
       types:
         # Force certain settings to certain type
         demo_mode: boolean
-      
+        image_styles: hash
+
       options:
         # Options for boolean settings
         demo_mode:

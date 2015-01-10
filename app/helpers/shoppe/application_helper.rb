@@ -40,6 +40,37 @@ module Shoppe
           s << label_tag("settings_#{field}_false", t("shoppe.settings.options.#{field}.negative", :default => 'No'))
           s << "</div>"
         end.html_safe
+      when 'hash'
+        String.new.tap do |s|
+          value = default if value.blank?
+
+          s << "<table class='imageStyles'><tbody>"
+
+          # TEMPLATE -- START --
+          s << "<tr class='template' style='display:none;'><td>"
+          s << text_field_tag("settings[#{field}][][name]", '', options.merge(placeholder: 'Name', class: 'text'))
+          s << "</td><td>"
+          s << text_field_tag("settings[#{field}][][dimensions]", '', options.merge(placeholder: 'Value', class: 'text'))
+          s << "</td><td class='remove'>"
+          s << link_to(t(:remove), '#', :class => 'button button-mini purple')
+          s << "</td></tr>"
+          # TEMPLATE -- END --
+
+          value.each do |name, dimensions|
+            s << "<tr><td>"
+            s << text_field_tag("settings[#{field}][][name]", name, options.merge(placeholder: 'Name', class: 'text'))
+            s << "</td><td>"
+            s << text_field_tag("settings[#{field}][][dimensions]", dimensions, options.merge(placeholder: 'Value', class: 'text'))
+            s << "</td><td class='remove'>"
+            s << link_to(t(:remove), '#', :class => 'button button-mini purple')
+            s << "</td></tr>"
+          end
+
+          s << "</tbody></table>"
+
+          s << link_to(t(:image_styles_add), '#', :data => {:behavior => 'addStyleToTable'}, :class => 'button button-mini green')
+
+        end.html_safe
       else
         text_field_tag "settings[#{field}]", value, options.merge(:placeholder => default, :class => 'text')
       end
