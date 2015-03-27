@@ -61,7 +61,7 @@ module Shoppe
 
     def default_image
       images.where(default: true).first ||
-      images.first
+      images.first || parent.try(:default_image)
     end
 
     # Return the name of the product
