@@ -21,7 +21,7 @@ module Shoppe
           end
         end
 
-        redirect_to :products, :flash => {:notice => confirm_added(:product) }
+        redirect_to :products, :flash => {:notice =>  t('shoppe.products.create_notice') }
       else
         render :action => "new"
       end
@@ -37,7 +37,7 @@ module Shoppe
             @product.images.create(source: image)
           end
         end
-        redirect_to [:edit, @product], :flash => {:notice => confirm_updated(:product) }
+        redirect_to [:edit, @product], :flash => {:notice => t('shoppe.products.update_notice') }
       else
         render :action => "edit"
       end
@@ -54,7 +54,18 @@ module Shoppe
 
     def destroy
       @product.destroy
-      redirect_to :products, :flash => {:notice => confirm_removed(:product)}
+      redirect_to :products, :flash => {:notice =>  t('shoppe.products.destroy_notice')}
+    end
+
+    def import
+      if request.post?
+        if params[:import].nil?
+          redirect_to import_products_path, :flash => {:alert => I18n.t('shoppe.imports.errors.no_file')}
+        else
+          Shoppe::Product.import(params[:import][:import_file])
+          redirect_to products_path, :flash => {:notice => I18n.t("shoppe.products.imports.success")}
+        end
+      end
     end
 
     private

@@ -1,6 +1,8 @@
 module Shoppe
   class Order < ActiveRecord::Base
     
+    extend ActiveModel::Callbacks
+    
     # These additional callbacks allow for applications to hook into other
     # parts of the order lifecycle.
     define_model_callbacks :confirmation, :acceptance, :rejection
@@ -41,7 +43,7 @@ module Shoppe
         self.order_items.each(&:confirm!)
 
         # Send an email to the customer
-        Shoppe::OrderMailer.received(self).deliver
+        deliver_received_order_email
       end
     
       # We're all good.
@@ -52,15 +54,13 @@ module Shoppe
     #
     # @param user [Shoppe::User] the user who carried out this action    
     def accept!(user = nil)
-      transaction do
-        run_callbacks :acceptance do
-          self.accepted_at = Time.now
-          self.accepter = user if user
-          self.status = 'accepted'
-          self.save!
-          self.order_items.each(&:accept!)
-          Shoppe::OrderMailer.accepted(self).deliver
-        end
+      run_callbacks :acceptance do
+        self.accepted_at = Time.now
+        self.accepter = user if user
+        self.status = 'accepted'
+        self.save!
+        self.order_items.each(&:accept!)
+        deliver_accepted_order_email
       end
     end
   
@@ -68,16 +68,26 @@ module Shoppe
     #
     # @param user [Shoppe::User] the user who carried out the action
     def reject!(user = nil)
-      transaction do
-        run_callbacks :rejection do
-          self.rejected_at = Time.now
-          self.rejecter = user if user
-          self.status = 'rejected'
-          self.save!
-          self.order_items.each(&:reject!)
-          Shoppe::OrderMailer.rejected(self).deliver
-        end
+      run_callbacks :rejection do
+        self.rejected_at = Time.now
+        self.rejecter = user if user
+        self.status = 'rejected'
+        self.save!
+        self.order_items.each(&:reject!)
+        deliver_rejected_order_email
       end
+    end
+
+    def deliver_accepted_order_email
+      Shoppe::OrderMailer.accepted(self).deliver_now
+    end
+
+    def deliver_rejected_order_email
+      Shoppe::OrderMailer.rejected(self).deliver_now
+    end
+
+    def deliver_received_order_email
+      Shoppe::OrderMailer.received(self).deliver_now
     end
     
   end

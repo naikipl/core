@@ -6,11 +6,11 @@ module Shoppe
     end
 
     def status_tag(status)
-      content_tag :span, status, :class => "status-tag #{status}"
+      content_tag :span, t("shoppe.orders.statuses.#{status}"), :class => "status-tag #{status}"
     end
 
     def settings_label(field)
-      "<label for='settings_#{field}'>#{t("settings.labels.#{field}")}</label>".html_safe
+      "<label for='settings_#{field}'>#{t("shoppe.settings.labels.#{field}")}</label>".html_safe
     end
 
     def remove_datasheet_link(product)
@@ -20,8 +20,8 @@ module Shoppe
     end
 
     def delete_image_link(image)
-      label = t('shoppe.helpers.attachment_preview.delete', default: 'Delete this file?')
-      confirm_text = t('shoppe.helpers.attachment_preview.delete_confirm', default: "Are you sure you wish to remove this attachment?")
+      label = t('helpers.attachment_preview.delete', default: 'Delete this file?')
+      confirm_text = t('helpers.attachment_preview.delete_confirm', :default => "Are you sure you wish to remove this attachment?")
       link_to(label, image_path(image), method: :delete, data: { confirm: confirm_text })
     end
 
@@ -74,11 +74,6 @@ module Shoppe
       else
         text_field_tag "settings[#{field}]", value, options.merge(:placeholder => default, :class => 'text')
       end
-    end
-
-    def t text , opts = {}
-      opts[:scope] = "shoppe" unless opts[:scope]
-      I18n.t( text , opts)
     end
 
   end

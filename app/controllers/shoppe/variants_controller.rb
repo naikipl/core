@@ -1,4 +1,4 @@
-  module Shoppe
+module Shoppe
   class VariantsController < ApplicationController
 
     before_filter { @active_nav = :products }
@@ -17,7 +17,7 @@
     def create
       @variant = @product.variants.build(safe_params)
       if @variant.save
-        redirect_to [@product, :variants], :notice => confirm_added(:varient)
+        redirect_to [@product, :variants], :notice =>  t('shoppe.variants.create_notice')
       else
         render :action => "form"
       end
@@ -29,7 +29,7 @@
 
     def update
       if @variant.update(safe_params)
-        redirect_to edit_product_variant_path(@product, @variant), :notice => confirm_updated(:varient)
+        redirect_to edit_product_variant_path(@product, @variant), :notice => t('shoppe.variants.update_notice')
       else
         render :action => "form"
       end
@@ -37,7 +37,7 @@
 
     def destroy
       @variant.destroy
-      redirect_to [@product, :variants], :notice => confirm_removed(:varient)
+      redirect_to [@product, :variants], :notice =>  t('shoppe.variants.destroy_notice')
     end
 
     private

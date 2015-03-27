@@ -5,7 +5,7 @@ module Shoppe
 
     def update
       if Shoppe.settings.demo_mode?
-        raise Shoppe::Error, I18n.t(:settings_not_in_demo)
+        raise Shoppe::Error, t('shoppe.settings.demo_mode_error')
       end
 
       styles = {}
@@ -15,7 +15,7 @@ module Shoppe
       params[:settings][:image_styles] = styles
 
       Shoppe::Setting.update_from_hash(params[:settings].permit!)
-      redirect_to :settings, :notice => confirm_updated(:settings)
+      redirect_to :settings, :notice => t('shoppe.settings.update_notice')
     end
 
   end

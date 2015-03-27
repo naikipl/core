@@ -44,7 +44,7 @@ module Shoppe
     end
     
     def remove_item(identifier)
-      items.remote_if { |i| i.identifier.to_s == identifier.to_s }
+      items.delete_if { |i| i.identifier.to_s == identifier.to_s }
     end
     
     class NavigationItem
@@ -55,7 +55,7 @@ module Shoppe
       attr_accessor :active_if
       
       def description
-        I18n.translate("shoppe.#{manager.identifier}.#{identifier}")
+        I18n.translate("shoppe.navigation.#{manager.identifier}.#{identifier}")
       end
       
       def url(request = nil)
