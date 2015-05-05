@@ -14,10 +14,14 @@ module Shoppe
 
     has_many :images, dependent: :destroy, class_name: Shoppe::Image
 
-    # The product's category
+    # The product's categorizations
+    #
+    # @return [Shoppe::ProductCategorization]
+    has_many :product_categorizations, dependent: :destroy, class_name: 'Shoppe::ProductCategorization', inverse_of: :product
+    # The product's categories
     #
     # @return [Shoppe::ProductCategory]
-    belongs_to :product_category, :class_name => 'Shoppe::ProductCategory'
+    has_many :product_categories, class_name: 'Shoppe::ProductCategory', through: :product_categorizations
 
     # The product's tax rate
     #
@@ -35,7 +39,7 @@ module Shoppe
 
     # Validations
     with_options :if => Proc.new { |p| p.parent.nil? } do |product|
-      product.validates :product_category_id, :presence => true
+      product.validate :has_at_least_one_product_category
       product.validates :description, :presence => true
       product.validates :short_description, :presence => true
     end
@@ -103,6 +107,13 @@ module Shoppe
       self.stock_level_adjustments.sum(:adjustment)
     end
 
+    # Return the first product category
+    #
+    # @return [Shoppe::ProductCategory]
+    def product_category
+      self.product_categories.first rescue nil
+    end
+
     # Search for products which include the given attributes and return an active record
     # scope of these products. Chainable with other scopes and with_attributes methods.
     # For example:
@@ -143,19 +154,16 @@ module Shoppe
             product.weight = row["weight"]
             product.price = row["price"].nil? ? 0 : row["price"]
 
-            product.product_category_id = begin
+            product.product_categories << begin
               if Shoppe::ProductCategory.find_by(name: row["category_name"]).present?
-                # Find and set the category
-                Shoppe::ProductCategory.find_by(name: row["category_name"]).id
+                Shoppe::ProductCategory.find_by(name: row["category_name"])
               else
-                # Create the category
-                Shoppe::ProductCategory.create(name: row["category_name"]).id
+                Shoppe::ProductCategory.create(name: row["category_name"])
               end
             end
 
             product.save!
 
-            # Create quantities
             qty = row["qty"].to_i
             if qty > 0
               product.stock_level_adjustments.create!(description: I18n.t('shoppe.import'), adjustment: qty)
@@ -172,6 +180,14 @@ module Shoppe
       when ".xlsx" then Roo::Excelx.new(file.path)
       else raise I18n.t('shoppe.imports.errors.unknown_format', filename: File.original_filename)
       end
+    end
+
+    private
+
+    # Validates
+
+    def has_at_least_one_product_category
+      errors.add(:base, 'must add at least one product category') if self.product_categories.blank?
     end
 
   end
