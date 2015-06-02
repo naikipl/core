@@ -2,11 +2,25 @@
 
 This document outlines key changes which are introduced in each version. The full commit history can be found [on GitHub](http://github.com/tryshoppe/core).
 
-## v1.0.6 (Master)
+## v1.0.8 (Master)
 
-* ...
+* Localisations / Translations for Products & Product Categories
+* Customers & Addresses ([#167](https://github.com/tryshoppe/shoppe/pull/167))
 
-## v1.0.5 (Stable)
+## v1.0.7 (Released)
+
+* Fix to seeds
+* Product category hierarchy_array ([#194](https://github.com/tryshoppe/shoppe/pull/194))
+
+## v1.0.6
+
+* German translations ([#180](https://github.com/tryshoppe/shoppe/pull/180))
+* Multiple product categories with nesting ([#137](https://github.com/tryshoppe/shoppe/pull/137))
+* Added refund callback to Payment model 
+
+## v1.0.5
+
+* Added Customers ([#119](https://github.com/tryshoppe/shoppe/pull/119))
 
 * Fixed creation of orders in admin interface
 

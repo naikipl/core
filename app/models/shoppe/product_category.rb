@@ -9,9 +9,9 @@ module Shoppe
     # to a branch in the .gemspec
     acts_as_nested_set  dependent: :restrict_with_exception,
                         after_move: :set_ancestral_permalink
-  
+
     self.table_name = 'shoppe_product_categories'
-    
+
     # Categories have an image attachment
     has_one :image, dependent: :destroy, class_name: Shoppe::Image
 
@@ -23,14 +23,14 @@ module Shoppe
     validates :name, :presence => true
     validates :permalink, :presence => true, :uniqueness => {scope: :parent_id}, :permalink => true
 
-    # All categories ordered by their name ascending
-    scope :ordered, -> { order(:name) }
-
     # Root (no parent) product categories only
     scope :without_parent, -> { where(parent_id: nil) }
- 
+
     # No descendents
     scope :except_descendants, ->(record) { where.not(id: (Array.new(record.descendants) << record).flatten) }
+
+    translates :name, :permalink, :description, :short_description
+    scope :ordered, -> { includes(:translations).order(:name) }
     
     # Set the permalink on callback
     before_validation :set_permalink, :set_ancestral_permalink
@@ -42,6 +42,13 @@ module Shoppe
       else
         self.permalink
       end
+    end
+
+    # Return array with all the product category parents hierarchy
+    # in descending order
+    def hierarchy_array
+      return [self] unless parent
+      parent.hierarchy_array.concat [self]
     end
 
     private
@@ -63,6 +70,6 @@ module Shoppe
         category.save!  # save forces children to update their ancestral_permalink
       end
     end
-  
+
   end
 end

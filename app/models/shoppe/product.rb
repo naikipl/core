@@ -1,4 +1,5 @@
-require 'roo'
+require "roo"
+require "globalize"
 
 module Shoppe
   class Product < ActiveRecord::Base
@@ -62,8 +63,9 @@ module Shoppe
     # All featured products
     scope :featured, -> {where(:featured => true)}
 
-    # All products ordered with default items first followed by name ascending
-    scope :ordered, -> {order(:default => :desc, :name => :asc)}
+    # Localisations
+    translates :name, :permalink, :description, :short_description
+    scope :ordered, -> { includes(:translations).order(:name) }
 
     def default_image
       images.where(default: true).first ||
@@ -90,6 +92,7 @@ module Shoppe
     #
     # @return [BigDecimal]
     def price
+      # self.default_variant ? self.default_variant.price : read_attribute(:price)
       self.default_variant ? self.default_variant.price : read_attribute(:price)
     end
 
@@ -153,6 +156,7 @@ module Shoppe
             product.short_description = row["short_description"]
             product.weight = row["weight"]
             product.price = row["price"].nil? ? 0 : row["price"]
+            product.permalink  = row["permalink"]
 
             product.product_categories << begin
               if Shoppe::ProductCategory.find_by(name: row["category_name"]).present?
