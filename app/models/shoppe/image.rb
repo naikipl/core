@@ -2,7 +2,7 @@ module Shoppe
   class Image < ActiveRecord::Base
     self.table_name = 'shoppe_images'
 
-    has_attached_file :source, styles: Shoppe.settings.image_styles.symbolize_keys! || {}
+    has_attached_file :source, styles: Shoppe.settings.image_styles.symbolize_keys!
 
     validates_attachment_content_type :source, content_type: /\Aimage\/.*\Z/
 

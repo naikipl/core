@@ -20,3 +20,4 @@ en:
         currency_unit: $
         tax_name: Tax
         demo_mode: false
+        image_styles: {}
